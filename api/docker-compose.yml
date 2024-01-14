@@ -8,14 +8,15 @@ services:
       - 8000:8000
     build:
       context: .
-    restart: unless-stopped
+    restart: always
     env_file:
       - .env
     volumes:
       - .:/arp_api
       - media:/media
     networks:
-      - arp_net
+      - arp_api_net
+      - arp_db_net
     command: sh docker-entrypoint.sh
     depends_on:
       - arp_db
@@ -23,19 +24,25 @@ services:
   arp_db:
     image: 'postgres:16'
     container_name: 'arp_db'
-    restart: unless-stopped
+    restart: always
     ports:
       - 5434:5434
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     networks:
-      - arp_net
+      - arp_db_net
     environment:
       - POSTGRES_USER=arp
       - POSTGRES_PASSWORD=@RP
       - POSTGRES_DB=arp
 
 networks:
-  arp_net:
-    name: arp_net
+  arp_api_net:
+    name: arp_api_net
     driver: bridge
+  arp_db_net:
+      driver: bridge
+      name: arp_db_net
+
+volumes:
+  media:
