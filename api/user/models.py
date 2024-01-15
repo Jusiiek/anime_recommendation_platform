@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
+
+# gettext_lazy is a function used for translating text in Django applications.
+# It is similar to the gettext
 from django.utils.translation import gettext_lazy as _
 
 
@@ -29,9 +32,10 @@ class User(AbstractUser):
     username = models.CharField(_('username'), max_length=50, unique=True, blank=False, null=False)
 
     is_active = models.BooleanField(default=False)
-    is_staff = models.BooleanField(default=False)
-    date_joined = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now_add=True)
+    is_staff = models.BooleanField(default=True)
+    is_superuser = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
