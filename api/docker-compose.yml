@@ -1,6 +1,21 @@
 version: "3.9"
 
 services:
+  arp_db:
+    image: 'postgres:16'
+    container_name: 'arp_db'
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    networks:
+      - arp_db_net
+    environment:
+      - POSTGRES_USER=arp
+      - POSTGRES_PASSWORD=@RP
+      - POSTGRES_DB=arp
+
   arp_api:
     container_name: 'arp_api'
     image: arp_api
@@ -14,27 +29,13 @@ services:
     volumes:
       - .:/arp_api
       - media:/media
+      - static:/static
     networks:
       - arp_api_net
       - arp_db_net
     command: sh docker-entrypoint.sh
     depends_on:
       - arp_db
-
-  arp_db:
-    image: 'postgres:16'
-    container_name: 'arp_db'
-    restart: always
-    ports:
-      - 5434:5434
-    volumes:
-      - ./data/postgres:/var/lib/postgresql/data
-    networks:
-      - arp_db_net
-    environment:
-      - POSTGRES_USER=arp
-      - POSTGRES_PASSWORD=@RP
-      - POSTGRES_DB=arp
 
 networks:
   arp_api_net:
@@ -46,3 +47,4 @@ networks:
 
 volumes:
   media:
+  static:
