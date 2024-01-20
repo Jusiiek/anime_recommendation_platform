@@ -86,3 +86,20 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         instance.username = validated_data['username']
         instance.save()
         return instance
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+
+    email = serializers.EmailField(min_length=2)
+    url = serializers.CharField(required=True)
+    class Meta:
+        model = User
+        fields = ['email', 'url', 'id']
+
+    def validate(self, attrs: dict) -> dict:
+        request = self.context['request']
+        email = request.data['email']
+        url = request.data['url']
+        if User.objects.filter(email=email).exists():
+            user = User.objects.get(email=email)
+

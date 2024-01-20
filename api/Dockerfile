@@ -6,4 +6,9 @@ COPY ./requirements.txt ./arp_api/
 COPY . /arp_api
 WORKDIR ./arp_api
 
+RUN mkdir -p /media /static
+
+RUN python3 -m pip uninstall -y psycopg2
+RUN python3 -m pip install psycopg2
+
 RUN pip3 install -r requirements.txt

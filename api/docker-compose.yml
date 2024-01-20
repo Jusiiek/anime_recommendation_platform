@@ -42,8 +42,8 @@ networks:
     name: arp_api_net
     driver: bridge
   arp_db_net:
-      driver: bridge
       name: arp_db_net
+      driver: bridge
 
 volumes:
   media:
