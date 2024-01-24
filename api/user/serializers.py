@@ -4,11 +4,13 @@ from django.contrib.auth.models import models
 from rest_framework import serializers
 
 from .models import User
+from permissions.utils import get_permissions
 
 
 class UserSerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField('get_role')
     role_display = serializers.SerializerMethodField('get_role_display')
+    user_permissions = serializers.SerializerMethodField('get_user_permissions')
     is_superuser = models.BooleanField()
 
     class Meta:
@@ -17,11 +19,14 @@ class UserSerializer(serializers.ModelSerializer):
 
         extra_kwargs = {'password': {'write_only': True}}
 
-    def get_role(self, obj):
+    def get_role(self, obj: User) -> str:
         return obj.role.name
 
-    def get_role_display(self, obj):
+    def get_role_display(self, obj: User) -> str:
         return obj.role.get_name_display()
+
+    def get_user_permissions(self, obj: User) -> list:
+        return get_permissions(obj)
 
     def update(self, instance: User, validated_data):
         instance.username = validated_data['username']
@@ -57,10 +62,13 @@ class UserFrontendSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        execlude = ('password',)
+        exclude = ('password',)
 
-    def get_role(self, obj):
+    def get_role(self, obj: User) -> str:
         return obj.role.name
 
-    def get_role_display(self,obj):
+    def get_role_display(self, obj: User) -> str:
         return obj.role.get_name_display()
+
+    def get_user_permissions(self, obj: User) -> list:
+        return get_permissions(obj)
