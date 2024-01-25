@@ -1,7 +1,7 @@
 from .models import UserRolePermission
 from .serializers import UserRolePermissionSerializer
 
-from users.models import User
+from user.models import User
 
 
 def has_permission(permission, user: User):

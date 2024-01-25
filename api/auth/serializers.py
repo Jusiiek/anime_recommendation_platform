@@ -4,6 +4,11 @@ from rest_framework.validators import UniqueValidator
 from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.utils.encoding import smart_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.contrib.auth.password_validation import validate_password
+
+from config import settings
 
 from api.user.models import User
 
@@ -54,6 +59,24 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ['email', 'username', 'password']
 
 
+class ChangePasswordSerializer(serializers.ModelSerializer):
+    """
+    change password for user
+    """
+    password = serializers.CharField(write_only=True, required=True)
+    old_password = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = User
+        fields = ('old_password', 'password')
+
+    def update(self, instance, validated_data):
+        instance.set_password(validated_data['password'])
+        instance.save()
+
+        return instance
+
+
 class UpdateUserSerializer(serializers.ModelSerializer):
     """
     User updating
@@ -92,6 +115,7 @@ class ResetPasswordSerializer(serializers.Serializer):
 
     email = serializers.EmailField(min_length=2)
     url = serializers.CharField(required=True)
+
     class Meta:
         model = User
         fields = ['email', 'url', 'id']
@@ -102,4 +126,40 @@ class ResetPasswordSerializer(serializers.Serializer):
         url = request.data['url']
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
+            uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
+            absurl = f"{url}/{uidb64}/{RefreshToken.for_user(user)}"
+        #     TODO add sens email
+        return super().validate(attrs)
 
+
+class SetNewPasswordSerializer(serializers.ModelSerializer):
+    """
+        set new password
+    """
+    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    password2 = serializers.CharField(write_only=True, required=True)
+    token = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = User
+        fields = ('password', 'password2', 'token')
+
+    def validate(self, attrs):
+        try:
+            password = attrs.get('password')
+            repeat_password = attrs.get('password2')
+            token = attrs.get('token')
+
+            user_id = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])['user_id']
+            user = User.objects.get(id=user_id)
+
+            if not user:
+                raise serializers.ValidationError({"error": "Invalid reset password link"})
+            if password != repeat_password:
+                raise serializers.ValidationError({"password": "Password fields didn't match."})
+
+            user.set_password(password)
+            user.save()
+            return token
+        except Exception as e:
+            raise AuthenticationFailed('The reset link is invalid', 401)
