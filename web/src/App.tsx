@@ -1,13 +1,15 @@
 import React from 'react';
 import {useSelector, useDispatch} from "react-redux";
 import {ThemeState} from "./store/themes_reducer";
-import "./styles/main.scss"
+import "./styles/index.scss"
 
 import {
     Box,
     Container
 
 } from "@mui/material";
+
+import Home from "./views/home/home"
 
 
 function App() {
@@ -16,7 +18,7 @@ function App() {
     return (
         <Container className={`app ${themeState.theme}`}>
             <Box>
-                xx
+                <Home />
             </Box>
         </Container>
     );

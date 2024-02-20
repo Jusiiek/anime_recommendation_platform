@@ -1,6 +1,9 @@
 FROM python:3.10 as build-python
 
-RUN apt-get -y update
+RUN apt-get -y update \
+    && apt-get install -y gettext \
+    # Cleanup apt cache
+    && apt-get clean \
 COPY ./requirements.txt ./arp_api/
 
 COPY . /arp_api
