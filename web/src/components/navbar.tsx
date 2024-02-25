@@ -1,4 +1,5 @@
 import React from "react";
+import {useSelector, useDispatch} from "react-redux";
 import {
     AppBar,
     Box,
@@ -17,7 +18,7 @@ import {UserPanel} from "./user_panel";
 
 const Navbar = () => {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
-    const isMobile = true;
+    const isMobile = false;
     const pages = [
         {
             text: 'List',
@@ -37,7 +38,7 @@ const Navbar = () => {
     }
 
     return (
-        <AppBar position="static" className={'p-3'}>
+        <AppBar position="static" color={'primary'} className={'p-3 rounded-br-3xl rounded-bl-3xl'}>
             <Grid container>
                 <Grid item xs={8}>
                     {
@@ -49,7 +50,7 @@ const Navbar = () => {
                                         size={'large'}
                                         aria-label="menu"
                                         onClick={handleOpenMenu}
-                                        sx={{ mr: 2 }}
+                                        sx={{mr: 2}}
                                         color={'inherit'}>
                                         <MenuIcon/>
                                     </IconButton>
