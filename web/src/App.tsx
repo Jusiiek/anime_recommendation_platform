@@ -5,22 +5,27 @@ import "./styles/index.scss"
 
 import {
     Box,
-    Container
+    Container,
+    ThemeProvider
 
 } from "@mui/material";
 
 import Home from "./views/home/home"
+import {lightTheme, darkTheme} from "./assets/themes";
 
 
 function App() {
     const themeState = useSelector((state: ThemeState) => state);
     const dispatch = useDispatch();
+
     return (
-        <Container className={`app ${themeState.theme}`}>
-            <Box>
-                <Home />
-            </Box>
-        </Container>
+        <ThemeProvider theme={themeState.theme === 'light' ? lightTheme : darkTheme}>
+            <Container className={`app ${themeState.theme}`}>
+                <Box>
+                    <Home/>
+                </Box>
+            </Container>
+        </ThemeProvider>
     );
 }
 

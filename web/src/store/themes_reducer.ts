@@ -6,7 +6,7 @@ export interface ThemeState {
 }
 
 export const initialTheme: ThemeState = {
-    theme: 'dark'
+    theme: 'light'
 }
 
 export const ThemeReducer = (state: ThemeState = initialTheme, action: Actions): ThemeState => {
