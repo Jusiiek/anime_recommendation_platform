@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 class CustomUserManager(UserManager):
 
-    def create_user(self, email, username, password=None, **extra_fields):
+    def create_user(self, email, username, password=None, role=None, **extra_fields):
         if not email:
             raise ValueError('Email is required')
         if not username:
@@ -17,25 +17,22 @@ class CustomUserManager(UserManager):
         username = self.normalize_email(username)
         user = self.model(email=email, username=username, **extra_fields)
         user.set_password(password)
-        user.save(using=self._db)
+        user.set_role(role)
+        user.save(using=self.db)
         return user
 
-    def create_superuser(self, email, username, password=None, **extra_fields):
+    def create_superuser(self, email, username, password=None, role=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
-        return self.create_user(email, username, password, **extra_fields)
+        return self.create_user(email, username, password, role, **extra_fields)
 
 
 class User(AbstractUser):
+    objects = CustomUserManager()
+
     email = models.CharField(_('email address'), unique=True)
     username = models.CharField(_('username'), max_length=50, unique=True, blank=False, null=False)
-
-    is_active = models.BooleanField(default=False)
-    is_staff = models.BooleanField(default=True)
-    is_superuser = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now_add=True)
     avatar = models.FileField(upload_to='user_avatars')
 
     USERNAME_FIELD = 'username'
