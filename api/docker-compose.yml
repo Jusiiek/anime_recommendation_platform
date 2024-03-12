@@ -13,29 +13,29 @@ services:
       - arp_db_net
     environment:
       - POSTGRES_USER=arp
-      - POSTGRES_PASSWORD=@RP
+      - POSTGRES_PASSWORD=ARP
       - POSTGRES_DB=arp
 
-  arp_api:
-    container_name: 'arp_api'
-    image: arp_api
-    ports:
-      - 8000:8000
-    build:
-      context: .
-    restart: always
-    env_file:
-      - .env
-    volumes:
-      - .:/arp_api
-      - media:/media
-      - static:/static
-    networks:
-      - arp_api_net
-      - arp_db_net
-    command: sh docker-entrypoint.sh
-    depends_on:
-      - arp_db
+#  arp_api:
+#    container_name: 'arp_api'
+#    image: arp_api
+#    ports:
+#      - 8000:8000
+#    build:
+#      context: .
+#    restart: always
+#    env_file:
+#      - .env
+#    volumes:
+#      - .:/arp_api
+#      - media:/media
+#      - static:/static
+#    networks:
+#      - arp_api_net
+#      - arp_db_net
+#    command: sh docker-entrypoint.sh
+#    depends_on:
+#      - arp_db
 
 networks:
   arp_api_net:

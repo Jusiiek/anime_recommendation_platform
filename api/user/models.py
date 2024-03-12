@@ -8,39 +8,36 @@ from django.utils.translation import gettext_lazy as _
 
 class CustomUserManager(UserManager):
 
-    def create_user(self, email, username, password=None, role=None, **extra_fields):
+    def create_user(self, email, password=None, role=None, **extra_fields):
         if not email:
             raise ValueError('Email is required')
-        if not username:
-            raise ValueError('Username is required')
         email = self.normalize_email(email)
-        username = self.normalize_email(username)
-        user = self.model(email=email, username=username, **extra_fields)
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.set_role(role)
         user.save(using=self.db)
         return user
 
-    def create_superuser(self, email, username, password=None, role=None, **extra_fields):
+    def create_superuser(self, email, password=None, role=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
-        return self.create_user(email, username, password, role, **extra_fields)
+        return self.create_user(email, password, role, **extra_fields)
 
 
 class User(AbstractUser):
     objects = CustomUserManager()
 
     email = models.CharField(_('email address'), unique=True)
-    username = models.CharField(_('username'), max_length=50, unique=True, blank=False, null=False)
+    username = models.CharField(_('username'), max_length=150, null=True, blank=True)
     avatar = models.FileField(upload_to='user_avatars')
 
-    USERNAME_FIELD = 'username'
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
     def set_role(self, role):
         if self.role:
-            user_role = UserRole.objects.get(role=role)
+            user_role = UserRole.objects.get(name=role)
             user_role.user_role = role
             user_role.save()
         else:
